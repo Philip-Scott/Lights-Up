@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Lights-Up
+Comment=Take control your Lights
+Icon=com.github.philip-scott.lights-up
+Exec=com.github.philip-scott.lights-up
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=GNOME;GTK;IDE;Utility;TextEditor;WebDevelopment;
+Keywords=app;template;vala;

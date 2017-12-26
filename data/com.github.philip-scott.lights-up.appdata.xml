@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>com.github.philip-scott.lights-up.desktop</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-3.0+</project_license>
+    <name>Lights-Up</name>
+    <summary>Control your Philips Hue lights from your desktop</summary>
+    <developer_name>Felipe Escoto</developer_name>
+    <provides>
+        <binary>com.github.philip-scott.lights-up</binary>
+    </provides>
+    <screenshots>
+    </screenshots>
+    <description>
+        <p></p>
+    </description>
+    <url type="homepage"></url>
+    <url type="bugtracker"></url>
+    <url type="help"></url>
+    <update_contact></update_contact>
+    <custom>
+        <value key="x-appcenter-color-primary"></value>
+        <value key="x-appcenter-color-primary-text"></value>
+        <value key="x-appcenter-suggested-price">1</value>
+    </custom>
+</component>
