@@ -18,7 +18,6 @@
 */
 
 public class LightsUp.Model.Light : Object {
-
     public string id { get; construct set; }
 
     public string name {
@@ -33,12 +32,36 @@ public class LightsUp.Model.Light : Object {
         }
     }
 
+    public string color_mode {
+        get {
+            return state.get_string_member ("colormode");
+        }
+    }
+
+    public int brightness {
+        get {
+            return (int) state.get_int_member ("bri");
+        } set {
+            update_property ("bri", value.to_string ());
+            state.set_int_member ("bri", value);
+        }
+    }
+
+    public int color_temperature {
+        get {
+            return (int) state.get_int_member ("ct");
+        } set {
+            update_property ("ct", value.to_string ());
+            state.set_int_member ("ct", value);
+        }
+    }
+
     public bool on {
-        set {
+        get {
+            return state.get_boolean_member ("on");
+        } set {
             update_property ("on", value.to_string ());
             state.set_boolean_member ("on", value);
-        } get {
-            return state.get_boolean_member ("on");
         }
     }
 
@@ -62,6 +85,6 @@ public class LightsUp.Model.Light : Object {
 
     private void update_property (string property, string value) {
         var endpoint = LightsUp.Api.Endpoint.get_instance ();
-        var response = endpoint.request ("PUT", "lights/%s/state".printf (id), "{\"%s\": %s}".printf (property, value));
+        endpoint.request ("PUT", "lights/%s/state".printf (id), "{\"%s\": %s}".printf (property, value));
     }
 }

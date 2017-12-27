@@ -45,7 +45,7 @@ public class LightsUp.Api.Endpoint : Object {
 
     private void fetch_user () {
         // TODO: Save local user:
-        var response = _request ("POST", "", """{"devicetype":"lightsUp#%s"}""".printf (Environment.get_user_name ()));
+        _request ("POST", "", """{"devicetype":"lightsUp#%s"}""".printf (Environment.get_user_name ()));
     }
 
     public string request (string method, string path, string? body) {

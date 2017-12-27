@@ -29,18 +29,15 @@ public class LightsUp.Api.Lights : Object {
         return instance;
     }
 
-    private Lights () {
-        var lights = get_lights ();
-        lights.nth_data (3).on = !lights.nth_data (3).on;
-    }
+    private Lights () {}
 
     public List<LightsUp.Model.Light> get_lights () {
-        var endpoint = Endpoint.get_instance ();
-        var response = endpoint.request ("GET", "lights", null);
-
         var lights = new List<LightsUp.Model.Light> ();
 
         try {
+            var endpoint = Endpoint.get_instance ();
+            var response = endpoint.request ("GET", "lights", null);
+
             var parser = new Json.Parser ();
 			parser.load_from_data (response, -1);
 
