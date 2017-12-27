@@ -35,6 +35,8 @@ public class LightsUp.Window : Gtk.ApplicationWindow {
             move (x, y);
         }
 
+        Api.Lights.get_instance ();
+
         show_all ();
     }
 }

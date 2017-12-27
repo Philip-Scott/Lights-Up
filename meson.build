@@ -34,7 +34,9 @@ executable('com.github.philip-scott.lights-up',
         dependency('granite'),
         dependency('gobject-2.0'),
         dependency('gtk+-3.0'),
-        dependency('glib-2.0')
+        dependency('glib-2.0'),
+        dependency('json-glib-1.0'),
+        dependency('libsoup-2.4')
     ],
     install : true
 )

@@ -11,5 +11,15 @@
 			<summary>Window position</summary>
 			<description>Window position</description>
 		</key>
+		<key name="host" type="s">
+			<default>""</default>
+			<summary>The IP address of the host</summary>
+			<description>192.168.1.0</description>
+		</key>
+		<key name="user" type="s">
+			<default>""</default>
+			<summary>The saved user, once authentication happens</summary>
+			<description>Keep it secret</description>
+		</key>
 	</schema>
 </schemalist>
