@@ -4,6 +4,8 @@ sources = files(
 
     'model/Light.vala',
 
+    'widgets/Light.vala',
+
     'Application.vala',
     'Main.vala',
     'Window.vala'

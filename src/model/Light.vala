@@ -18,7 +18,7 @@
 */
 
 public class LightsUp.Model.Light : Object {
-    public string id { get; construct set; }
+    public string id { get; set; }
 
     public string name {
         get {
@@ -34,7 +34,11 @@ public class LightsUp.Model.Light : Object {
 
     public string color_mode {
         get {
-            return state.get_string_member ("colormode");
+            if (state.has_member ("colormode")) {
+                return state.get_string_member ("colormode");
+            } else {
+                return "none";
+            }
         }
     }
 
@@ -79,12 +83,17 @@ public class LightsUp.Model.Light : Object {
 
     public Json.Object object { get; construct set; }
 
-    public Light (string id, Json.Object _object) {
-        Object (object: _object, id: id);
+    public Light (string _id, Json.Object _object) {
+        Object (object: _object, id: _id);
     }
 
     private void update_property (string property, string value) {
         var endpoint = LightsUp.Api.Endpoint.get_instance ();
-        endpoint.request ("PUT", "lights/%s/state".printf (id), "{\"%s\": %s}".printf (property, value));
+
+        var path = "lights/%s/state".printf (id);
+
+        var body = "{\"%s\": %s}".printf (property, value);
+
+        endpoint.request ("PUT", path, body);
     }
 }

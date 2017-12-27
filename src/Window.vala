@@ -35,7 +35,15 @@ public class LightsUp.Window : Gtk.ApplicationWindow {
             move (x, y);
         }
 
-        Api.Lights.get_instance ();
+        var lights = Api.Lights.get_instance ().get_lights ();
+
+        var grid = new Gtk.Grid ();
+        grid.orientation = Gtk.Orientation.VERTICAL;
+        add (grid);
+
+        lights.foreach ((i) => {
+            grid.add (new LightsUp.Widgets.LightWidget (i));
+        });
 
         show_all ();
     }
