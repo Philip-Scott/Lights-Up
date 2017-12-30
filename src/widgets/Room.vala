@@ -63,7 +63,6 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
         foreach (var id in light_ids) {
             var light = _lights.get (id);
             childs.add (new LightsUp.Widgets.LightWidget (light));
-            childs.add (new LightsUp.Widgets.LightWidget (light));
             this.lights.add (light);
 
             if (light.reachable) {
