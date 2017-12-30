@@ -40,12 +40,12 @@ public class LightsUp.Widgets.LightWidget : Gtk.Grid {
     construct {
         orientation = Gtk.Orientation.HORIZONTAL;
         column_spacing = 6;
-        margin = 6;
-        margin_start = 16;
+        margin_start = 12;
 
         label = new Gtk.Label (light.name);
         label.get_style_context ().add_class ("h4");
         label.halign = Gtk.Align.START;
+        label.margin_start = 12;
         label.hexpand = true;
 
         light_switch = new Gtk.Switch ();

@@ -22,7 +22,8 @@ public class LightsUp.Window : Gtk.ApplicationWindow {
     public Window (Gtk.Application app) {
         Object (
             application: app,
-            icon_name: LightsUp.Application.APP_ID
+            icon_name: LightsUp.Application.APP_ID,
+            title: "Lights-Up"
         );
     }
 
@@ -35,22 +36,17 @@ public class LightsUp.Window : Gtk.ApplicationWindow {
             move (x, y);
         }
 
-        var lights = Api.Lights.get_instance ().get_lights ();
-
         var grid = new Gtk.Grid ();
         grid.orientation = Gtk.Orientation.VERTICAL;
-        add (grid);
 
-        lights.foreach ((i) => {
-            grid.add (new LightsUp.Widgets.LightWidget (i));
-        });
-
+        var lights = Api.Lights.get_instance ().get_lights ();
         var rooms = Api.Rooms.get_instance ().get_rooms ();
 
-        rooms.foreach ((i) => {
-            grid.add (new LightsUp.Widgets.RoomWidget (i));
-        });
+        foreach (var room in rooms.values) {
+            grid.add (new LightsUp.Widgets.RoomWidget (room, lights));
+        };
 
+        add (grid);
         show_all ();
     }
 }

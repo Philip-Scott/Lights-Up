@@ -29,10 +29,12 @@ public class LightsUp.Api.Lights : Object {
         return instance;
     }
 
+    private Gee.HashMap<string, LightsUp.Model.Light> cache;
+
     private Lights () {}
 
-    public List<LightsUp.Model.Light> get_lights () {
-        var lights = new List<LightsUp.Model.Light> ();
+    public Gee.HashMap<string, LightsUp.Model.Light> get_lights () {
+        var lights = new Gee.HashMap<string, LightsUp.Model.Light> ();
 
         try {
             var endpoint = Endpoint.get_instance ();
@@ -44,10 +46,11 @@ public class LightsUp.Api.Lights : Object {
             var root_object = parser.get_root ().get_object ();
             root_object.foreach_member ((i, name, node) => {
                 var light = new LightsUp.Model.Light (name, node.get_object ());
-                lights.append (light);
+                lights.set (name, light);
             });
         } catch (Error e) {}
 
-        return (owned) lights;
+        cache = lights;
+        return lights;
     }
 }

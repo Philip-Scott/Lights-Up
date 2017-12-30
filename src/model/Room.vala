@@ -108,4 +108,13 @@ public class LightsUp.Model.Room : Object {
 
         endpoint.request ("GET", path, null);
     }
+
+    public Gee.LinkedList<string> get_lights () {
+        var list = new Gee.LinkedList<string> ();
+        object.get_array_member ("lights").get_elements ().foreach ((node) => {
+            list.add (node.get_string ());
+        });
+
+        return list;
+    }
 }

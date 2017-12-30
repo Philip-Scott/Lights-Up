@@ -27,6 +27,7 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
     public LightsUp.Model.Room room { get; construct set; }
 
     private Gtk.Scale brightness;
+    private Gtk.Grid childs;
 
     public bool active {
         set {
@@ -34,16 +35,22 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
         }
     }
 
-    public RoomWidget (LightsUp.Model.Room room) {
+    public RoomWidget (LightsUp.Model.Room room, Gee.HashMap<string, LightsUp.Model.Light> lights) {
         Object (room: room);
+
+        var light_ids = room.get_lights ();
+
+        foreach (var id in light_ids) {
+            childs.add (new LightsUp.Widgets.LightWidget (lights.get (id)));
+        }
     }
 
     construct {
-        orientation = Gtk.Orientation.VERTICAL;
         column_spacing = 6;
         margin = 6;
 
         var label = new Gtk.Label (room.name);
+        label.get_style_context ().add_class ("h3");
         label.get_style_context ().add_class ("h4");
         label.halign = Gtk.Align.START;
 
@@ -73,10 +80,14 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
 
         var image = new Gtk.Image.from_resource ("/com/github/philip-scott/lights-up/room-icon-symbolic");
 
+        childs = new Gtk.Grid ();
+        childs.orientation = Gtk.Orientation.VERTICAL;
+
         attach (image, 0, 0, 1, 2);
         attach (label, 1, 0, 1, 1);
         attach (brightness, 1, 1, 1, 1);
         attach (light_switch, 2, 0, 1, 2);
+        attach (childs, 0, 2, 3, 1);
 
         show_all ();
     }
