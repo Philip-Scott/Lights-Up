@@ -56,7 +56,8 @@ public class LightsUp.Widgets.LightWidget : Gtk.Grid {
             light.on = state;
         });
 
-        image = new Gtk.Image.from_resource ("/com/github/philip-scott/lights-up/light-icon-symbolic");
+        image = new Gtk.Image.from_icon_name ("light-icon-symbolic", Gtk.IconSize.LARGE_TOOLBAR);
+        image.get_style_context ().add_class ("light-icon");
 
         add (image);
         add (label);
@@ -64,5 +65,13 @@ public class LightsUp.Widgets.LightWidget : Gtk.Grid {
 
         reachable = light.reachable;
         show_all ();
+        set_color ();
+    }
+
+    private void set_color () {
+        var color = light.get_css_color ();
+        var CSS = ".light-icon {color: %s; }";
+
+        LightsUp.Utils.set_style (image, CSS.printf (color));
     }
 }

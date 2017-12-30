@@ -98,4 +98,34 @@ public class LightsUp.Model.Light : Object {
 
         endpoint.request ("PUT", path, body);
     }
+
+    public string get_css_color () {
+        if (color_mode == "ct") {
+            double percent = (double) (color_temperature - 153) / (454.0 - 153.0);
+
+            Gdk.RGBA color1, color2;
+            if (percent < 0.5) {
+                percent = percent * 2.0;
+
+                color1 = { 135.0 / 255.0, 183.0 / 255.0, 255.0 / 255.0, 1.0 }; // blue
+                color2 = { 237.0 / 255.0, 203.0 / 255.0, 175.0 / 255.0, 1.0 }; // light orange
+            } else {
+                percent = (percent - 0.5) * 2.0;
+
+                color1 = { 237.0 / 255.0, 181.0 / 255.0, 135.0 / 255.0, 1.0 }; // light orange
+                color2 = { 249.0 / 255.0, 87.0  / 255.0, 87.0  / 255.0, 1.0 }; // light red
+            }
+
+            Gdk.RGBA final_color = {
+                (color1.red * (1 - percent) + color2.red * percent),
+                (color1.green * (1 - percent) + color2.green * percent),
+                (color1.blue * (1 - percent) + color2.blue * percent),
+                1.0
+            };
+
+            return final_color.to_string ();
+        }
+
+        return "#FFD747";
+    }
 }

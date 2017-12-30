@@ -26,8 +26,10 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
 
     public LightsUp.Model.Room room { get; construct set; }
 
+    private Gee.LinkedList<LightsUp.Model.Light> lights;
     private Gtk.Scale brightness;
     private Gtk.Grid childs;
+    private Gtk.Image image;
 
     public bool active {
         set {
@@ -35,14 +37,18 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
         }
     }
 
-    public RoomWidget (LightsUp.Model.Room room, Gee.HashMap<string, LightsUp.Model.Light> lights) {
+    public RoomWidget (LightsUp.Model.Room room, Gee.HashMap<string, LightsUp.Model.Light> _lights) {
         Object (room: room);
 
         var light_ids = room.get_lights ();
+        this.lights = new Gee.LinkedList<LightsUp.Model.Light> ();
 
         foreach (var id in light_ids) {
-            childs.add (new LightsUp.Widgets.LightWidget (lights.get (id)));
+            childs.add (new LightsUp.Widgets.LightWidget (_lights.get (id)));
+            this.lights.add (_lights.get (id));
         }
+
+        set_color ();
     }
 
     construct {
@@ -78,7 +84,8 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
 
         active = room.on;
 
-        var image = new Gtk.Image.from_resource ("/com/github/philip-scott/lights-up/room-icon-symbolic");
+        image = new Gtk.Image.from_icon_name ("room-icon-symbolic", Gtk.IconSize.DIALOG);
+        image.get_style_context ().add_class ("room-icon");
 
         childs = new Gtk.Grid ();
         childs.orientation = Gtk.Orientation.VERTICAL;
@@ -90,5 +97,16 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
         attach (childs, 0, 2, 3, 1);
 
         show_all ();
+    }
+
+    private void set_color () {
+        string color = "none";
+        // TODO: Make gradient if more than one color
+        foreach (var light in lights) {
+            color = light.get_css_color ();
+        }
+
+        var CSS = ".room-icon {color: %s; }";
+        LightsUp.Utils.set_style (image, CSS.printf (color));
     }
 }

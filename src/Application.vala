@@ -33,7 +33,7 @@ public class LightsUp.Application : Granite.Application {
     public override void activate () {
         if (window == null) {
             weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
-            default_theme.add_resource_path ("/com/github/philip-scott/light-up/");
+            default_theme.add_resource_path ("/com/github/philip-scott/lights-up/icons");
 
             window = new LightsUp.Window (this);
             add_window (window);

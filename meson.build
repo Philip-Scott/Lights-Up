@@ -26,6 +26,9 @@ subdir('data')
 # subdir('po')
 subdir('src')
 
+cc = meson.get_compiler('c')
+m_dep = cc.find_library('m', required : false)
+
 executable('com.github.philip-scott.lights-up',
     sources,
     gresource,
@@ -37,7 +40,8 @@ executable('com.github.philip-scott.lights-up',
         dependency('gtk+-3.0'),
         dependency('glib-2.0'),
         dependency('json-glib-1.0'),
-        dependency('libsoup-2.4')
+        dependency('libsoup-2.4'),
+        m_dep
     ],
     install : true
 )
