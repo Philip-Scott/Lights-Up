@@ -23,7 +23,8 @@ public class LightsUp.Widgets.LightWidget : Gtk.Grid {
 
     public bool reachable {
         set {
-            light_switch.sensitive = value;
+            light_switch.visible = value;
+            light_switch.no_show_all = !value;
             label.sensitive = value;
             image.sensitive = value;
         }

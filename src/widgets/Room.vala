@@ -27,13 +27,29 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
     public LightsUp.Model.Room room { get; construct set; }
 
     private Gee.LinkedList<LightsUp.Model.Light> lights;
+
+    private Gtk.Stack reachable_stack;
+
     private Gtk.Scale brightness;
     private Gtk.Grid childs;
     private Gtk.Image image;
+    private Gtk.Switch light_switch;
 
     public bool active {
         set {
             brightness.sensitive = value;
+        }
+    }
+
+    public bool any_reachable {
+        set {
+            if (value) {
+                reachable_stack.set_visible_child_name ("brightness");
+            } else {
+                reachable_stack.set_visible_child_name ("non_reachable");
+            }
+
+            light_switch.sensitive = value;
         }
     }
 
@@ -43,11 +59,19 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
         var light_ids = room.get_lights ();
         this.lights = new Gee.LinkedList<LightsUp.Model.Light> ();
 
+        bool any_reach = false;
         foreach (var id in light_ids) {
-            childs.add (new LightsUp.Widgets.LightWidget (_lights.get (id)));
-            this.lights.add (_lights.get (id));
+            var light = _lights.get (id);
+            childs.add (new LightsUp.Widgets.LightWidget (light));
+            childs.add (new LightsUp.Widgets.LightWidget (light));
+            this.lights.add (light);
+
+            if (light.reachable) {
+                any_reach = true;
+            }
         }
 
+        any_reachable = any_reach;
         set_color ();
     }
 
@@ -73,7 +97,7 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
             room.brightness = 255 - (int) brightness.get_value ();
         });
 
-        var light_switch = new Gtk.Switch ();
+        light_switch = new Gtk.Switch ();
         light_switch.set_active (room.on);
         light_switch.valign = Gtk.Align.CENTER;
 
@@ -90,9 +114,18 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
         childs = new Gtk.Grid ();
         childs.orientation = Gtk.Orientation.VERTICAL;
 
+        var no_lights_label = new Gtk.Label ("<small>Unreachable</small>");
+        no_lights_label.halign = Gtk.Align.START;
+        no_lights_label.use_markup = true;
+        no_lights_label.sensitive = false;
+
+        reachable_stack = new Gtk.Stack ();
+        reachable_stack.add_named (brightness, "brightness");
+        reachable_stack.add_named (no_lights_label, "non_reachable");
+
         attach (image, 0, 0, 1, 2);
         attach (label, 1, 0, 1, 1);
-        attach (brightness, 1, 1, 1, 1);
+        attach (reachable_stack, 1, 1, 1, 1);
         attach (light_switch, 2, 0, 1, 2);
         attach (childs, 0, 2, 3, 1);
 
@@ -100,7 +133,7 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
     }
 
     private void set_color () {
-        string color = "none";
+        string color = "#aaa";
         // TODO: Make gradient if more than one color
         foreach (var light in lights) {
             color = light.get_css_color ();

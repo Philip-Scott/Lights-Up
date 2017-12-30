@@ -100,6 +100,10 @@ public class LightsUp.Model.Light : Object {
     }
 
     public string get_css_color () {
+        if (!reachable) {
+            return "#aaa";
+        }
+
         if (color_mode == "ct") {
             double percent = (double) (color_temperature - 153) / (454.0 - 153.0);
 
