@@ -17,7 +17,7 @@
 * Boston, MA 02110-1301 USA
 */
 
-public class LightsUp.Model.Light : Object {
+public class LightsUp.Model.Room : Object {
     public signal void updated ();
 
     public string id { get; set; }
@@ -28,52 +28,48 @@ public class LightsUp.Model.Light : Object {
         }
     }
 
-    public string light_type {
-        get {
-            return object.get_string_member ("type");
-        }
-    }
-
     public string color_mode {
         get {
-            if (state.has_member ("colormode")) {
-                return state.get_string_member ("colormode");
-            } else {
-                return "none";
-            }
+            return action.get_string_member ("colormode");
         }
     }
 
     public int brightness {
         get {
-            return (int) state.get_int_member ("bri");
+            return (int) action.get_int_member ("bri");
         } set {
             update_property ("bri", value.to_string ());
-            state.set_int_member ("bri", value);
+            action.set_int_member ("bri", value);
         }
     }
 
     public int color_temperature {
         get {
-            return (int) state.get_int_member ("ct");
+            return (int) action.get_int_member ("ct");
         } set {
             update_property ("ct", value.to_string ());
-            state.set_int_member ("ct", value);
+            action.set_int_member ("ct", value);
+        }
+    }
+
+    public bool any_on {
+        get {
+            return state.get_boolean_member ("any_on");
+        }
+    }
+
+    public bool all_on {
+        get {
+            return state.get_boolean_member ("all_on");
         }
     }
 
     public bool on {
         get {
-            return state.get_boolean_member ("on");
+            return action.get_boolean_member ("on");
         } set {
             update_property ("on", value.to_string ());
-            state.set_boolean_member ("on", value);
-        }
-    }
-
-    public bool reachable {
-        get {
-            return state.get_boolean_member ("reachable");
+            action.set_boolean_member ("on", value);
         }
     }
 
@@ -83,19 +79,33 @@ public class LightsUp.Model.Light : Object {
         }
     }
 
+    public Json.Object action {
+        get {
+            return object.get_object_member ("action");
+        }
+    }
+
     public Json.Object object { get; construct set; }
 
-    public Light (string _id, Json.Object _object) {
+    public Room (string _id, Json.Object _object) {
         Object (object: _object, id: _id);
     }
 
     private void update_property (string property, string value) {
         var endpoint = LightsUp.Api.Endpoint.get_instance ();
 
-        var path = "lights/%s/state".printf (id);
+        var path = "groups/%s/action".printf (id);
 
         var body = "{\"%s\": %s}".printf (property, value);
 
         endpoint.request ("PUT", path, body);
+    }
+
+    public void update () {
+        var endpoint = LightsUp.Api.Endpoint.get_instance ();
+
+        var path = "groups/%s/".printf (id);
+
+        endpoint.request ("GET", path, null);
     }
 }

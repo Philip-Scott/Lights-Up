@@ -21,68 +21,48 @@ public class LightsUp.Widgets.LightWidget : Gtk.Grid {
 
     public LightsUp.Model.Light light { get; construct set; }
 
-    private Gtk.Scale brightness;
-    private Gtk.Scale temp_scale;
-
-    public bool active {
+    public bool reachable {
         set {
-            if (temp_scale != null) {
-                temp_scale.sensitive = value;
-            }
-
-            brightness.sensitive = value;
+            light_switch.sensitive = value;
+            label.sensitive = value;
+            image.sensitive = value;
         }
     }
+
+    private Gtk.Switch light_switch;
+    private Gtk.Label label;
+    private Gtk.Image image;
 
     public LightWidget (LightsUp.Model.Light light) {
         Object (light: light);
     }
 
     construct {
-        orientation = Gtk.Orientation.VERTICAL;
+        orientation = Gtk.Orientation.HORIZONTAL;
+        column_spacing = 6;
         margin = 6;
+        margin_start = 16;
 
-        var label = new Gtk.Label (light.name);
+        label = new Gtk.Label (light.name);
         label.get_style_context ().add_class ("h4");
         label.halign = Gtk.Align.START;
+        label.hexpand = true;
 
-        add (label);
+        light_switch = new Gtk.Switch ();
+        light_switch.valign = Gtk.Align.CENTER;
+        light_switch.set_active (light.on);
 
-        if (light.color_mode == "ct") {
-            temp_scale = new Gtk.Scale.with_range (Gtk.Orientation.HORIZONTAL, 0, 454, 10);
-            temp_scale.draw_value = false;
-            temp_scale.has_origin = false;
-            temp_scale.hexpand = true;
-            temp_scale.inverted = true;
-            temp_scale.width_request = 200;
-            temp_scale.get_style_context ().add_class ("temperature");
-
-            add (temp_scale);
-
-            temp_scale.set_value (454 - light.color_temperature);
-            temp_scale.value_changed.connect (() => {
-                light.color_temperature = 454 - (int) temp_scale.get_value ();
-            });
-        }
-
-        brightness = new Gtk.Scale.with_range (Gtk.Orientation.HORIZONTAL, 0, 255, 10);
-        brightness.draw_value = false;
-        brightness.has_origin = false;
-        brightness.hexpand = true;
-        brightness.inverted = true;
-        brightness.width_request = 200;
-        brightness.get_style_context ().add_class ("color");
-
-        add (brightness);
-
-        brightness.set_value (255 - light.brightness);
-        brightness.value_changed.connect (() => {
-            light.brightness = 255 - (int) brightness.get_value ();
+        light_switch.state_set.connect ((state) => {
+            light.on = state;
         });
 
-        active = light.reachable && light.on;
+        image = new Gtk.Image.from_resource ("/com/github/philip-scott/lights-up/light-icon-symbolic");
 
-        add (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
+        add (image);
+        add (label);
+        add (light_switch);
+
+        reachable = light.reachable;
         show_all ();
     }
 }

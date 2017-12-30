@@ -31,6 +31,7 @@ executable('com.github.philip-scott.lights-up',
     gresource,
     c_args: c_args,
     dependencies :[
+        dependency('gee-0.8'),
         dependency('granite'),
         dependency('gobject-2.0'),
         dependency('gtk+-3.0'),

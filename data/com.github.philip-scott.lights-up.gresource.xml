@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-
+    <gresource prefix="/com/github/philip-scott/lights-up">
+        <file alias="light-icon-symbolic" compressed="true" preprocess="xml-stripblanks">Icons/light-icon-symbolic.svg</file>
+        <file alias="room-icon-symbolic" compressed="true" preprocess="xml-stripblanks">Icons/room-icon-symbolic.svg</file>
+    </gresource>
 </gresources>

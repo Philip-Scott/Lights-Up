@@ -45,6 +45,12 @@ public class LightsUp.Window : Gtk.ApplicationWindow {
             grid.add (new LightsUp.Widgets.LightWidget (i));
         });
 
+        var rooms = Api.Rooms.get_instance ().get_rooms ();
+
+        rooms.foreach ((i) => {
+            grid.add (new LightsUp.Widgets.RoomWidget (i));
+        });
+
         show_all ();
     }
 }

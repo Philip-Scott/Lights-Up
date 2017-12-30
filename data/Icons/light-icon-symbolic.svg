@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="24"
+   width="24"
+   version="1.1"
+   id="svg6"
+   sodipodi:docname="display-brightness-symbolic.svg"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
+  <metadata
+     id="metadata12">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs10" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     id="namedview8"
+     showgrid="true"
+     inkscape:zoom="20.85965"
+     inkscape:cx="10.43891"
+     inkscape:cy="9.7187983"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg6">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3703" />
+  </sodipodi:namedview>
+  <path
+     inkscape:connector-curvature="0"
+     id="path2"
+     style="color:#000000;overflow:visible;isolation:auto;mix-blend-mode:normal;fill:#666666;stroke-width:3.12813902;marker:none"
+     overflow="visible"
+     d="M 12,1 C 5.9344823,1.0000003 1.0174087,5.8865839 1.0174091,11.914489 1.0174087,17.942395 5.9344823,22.828977 12,22.828977 c 6.065519,0 10.982592,-4.886582 10.982592,-10.914488 C 22.982592,5.8865826 18.065519,0.99999963 12,1 Z m 0,3.1184252 c 4.332514,3e-7 7.844707,3.4904174 7.844707,7.7960638 0,4.305647 -3.512193,7.796063 -7.844707,7.796063 -4.3325122,0 -7.8447074,-3.490416 -7.8447076,-7.796063 C 4.155292,7.6088426 7.6674872,4.1184255 12,4.1184252 Z"
+     sodipodi:nodetypes="ssssssssss" />
+</svg>
