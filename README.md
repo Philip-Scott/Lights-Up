@@ -3,6 +3,9 @@
   <h3 align="center">Philips Hue controller for elementary OS.</h3>
 </div>
 
+<p align="center">
+    <img src="data/Screenshots/Screenshot.png" alt="Screenshot">
+</p>
 
 ## Installation
 
