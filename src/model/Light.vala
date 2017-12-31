@@ -101,7 +101,7 @@ public class LightsUp.Model.Light : Object {
 
     public string get_css_color () {
         if (!reachable) {
-            return "#aaa";
+            return "rgba(40, 40, 40, 0.3)";
         }
 
         if (color_mode == "ct") {
@@ -124,12 +124,12 @@ public class LightsUp.Model.Light : Object {
                 (color1.red * (1 - percent) + color2.red * percent),
                 (color1.green * (1 - percent) + color2.green * percent),
                 (color1.blue * (1 - percent) + color2.blue * percent),
-                1.0
+                ((double) brightness / 255.0).clamp (0.3, 1.0)
             };
 
             return final_color.to_string ();
         }
 
-        return "#FFD747";
+        return @"rgba(255, 208, 43, $(((double) brightness / 255.0).clamp (0.3, 1.0)))";
     }
 }
