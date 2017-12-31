@@ -28,9 +28,9 @@ public class LightsUp.Model.Room : Object {
         }
     }
 
-    public string color_mode {
+    public bool has_temperature {
         get {
-            return action.get_string_member ("colormode");
+            return action.has_member ("ct");
         }
     }
 

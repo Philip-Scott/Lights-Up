@@ -83,21 +83,10 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
         label.get_style_context ().add_class ("h4");
         label.halign = Gtk.Align.START;
 
-        brightness = new Gtk.Scale.with_range (Gtk.Orientation.HORIZONTAL, 0, 255, 10);
-        brightness.draw_value = false;
-        brightness.has_origin = false;
-        brightness.hexpand = true;
-        brightness.inverted = true;
-        brightness.width_request = 200;
-        brightness.get_style_context ().add_class ("color");
-
-        brightness.set_value (255 - room.brightness);
-        brightness.value_changed.connect (() => {
-            room.brightness = 255 - (int) brightness.get_value ();
-        });
+        brightness = new LightsUp.Widgets.Scale.room_brightness (room);
 
         light_switch = new Gtk.Switch ();
-        light_switch.set_active (room.on);
+        light_switch.set_active (room.any_on);
         light_switch.valign = Gtk.Align.CENTER;
 
         light_switch.state_set.connect ((state) => {
@@ -105,10 +94,22 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
             active =  state;
         });
 
-        active = room.on;
+        active = room.any_on;
 
         image = new Gtk.Image.from_icon_name ("room-icon-symbolic", Gtk.IconSize.DIALOG);
         image.get_style_context ().add_class ("room-icon");
+
+        var event_box = new Gtk.EventBox ();
+        event_box.events += Gdk.EventMask.BUTTON_PRESS_MASK;
+        event_box.add (image);
+
+        event_box.button_press_event.connect (() => {
+            var popover = new Popover.for_room (room);
+            popover.relative_to = image;
+
+            popover.show_all ();
+            return false;
+        });
 
         childs = new Gtk.Grid ();
         childs.orientation = Gtk.Orientation.VERTICAL;
@@ -122,7 +123,7 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
         reachable_stack.add_named (brightness, "brightness");
         reachable_stack.add_named (no_lights_label, "non_reachable");
 
-        attach (image, 0, 0, 1, 2);
+        attach (event_box, 0, 0, 1, 2);
         attach (label, 1, 0, 1, 1);
         attach (reachable_stack, 1, 1, 1, 1);
         attach (light_switch, 2, 0, 1, 2);
