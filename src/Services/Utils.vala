@@ -34,4 +34,9 @@ public class LightsUp.Utils {
             warning ("%s %s", widget.name, css);
         }
     }
+
+    public static void visible (Gtk.Widget widget, bool value) {
+        widget.visible = value;
+        widget.no_show_all = !value;
+    }
 }

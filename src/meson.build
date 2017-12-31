@@ -8,6 +8,7 @@ sources = files(
 
     'widgets/Light.vala',
     'widgets/Room.vala',
+    'widgets/Popover.vala',
 
     'Services/Utils.vala',
 

@@ -57,10 +57,23 @@ public class LightsUp.Widgets.LightWidget : Gtk.Grid {
             light.on = state;
         });
 
+        var event_box = new Gtk.EventBox ();
+        event_box.events += Gdk.EventMask.BUTTON_PRESS_MASK;
+
         image = new Gtk.Image.from_icon_name ("light-icon-symbolic", Gtk.IconSize.LARGE_TOOLBAR);
         image.get_style_context ().add_class ("light-icon");
 
-        add (image);
+        event_box.button_press_event.connect (() => {
+            var popover = new Popover.for_light (light);
+            popover.relative_to = image;
+
+            popover.show_all ();
+            return false;
+        });
+
+        event_box.add (image);
+
+        add (event_box);
         add (label);
         add (light_switch);
 
