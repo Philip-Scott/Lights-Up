@@ -18,6 +18,8 @@
 */
 
 public class LightsUp.Api.Endpoint : Object {
+    public signal void logged_in ();
+
     public string bridge_ip { get; set; }
     public string user { get; set; }
 
@@ -37,15 +39,35 @@ public class LightsUp.Api.Endpoint : Object {
         var settings = new GLib.Settings (LightsUp.Application.APP_ID);
         settings.bind ("host", this, "bridge_ip", GLib.SettingsBindFlags.DEFAULT);
         settings.bind ("user", this, "user", GLib.SettingsBindFlags.DEFAULT);
+    }
 
-        if (user == "") {
+    public void start_login () {
+        Timeout.add (2000, () => {
             fetch_user ();
-        }
+
+            if (user != "") {
+                print ("Logged in!\n");
+                logged_in ();
+                return GLib.Source.REMOVE;
+            } else {
+                return GLib.Source.CONTINUE;
+            }
+        });
     }
 
     private void fetch_user () {
-        // TODO: Save local user:
-        _request ("POST", "", """{"devicetype":"lightsUp#%s"}""".printf (Environment.get_user_name ()));
+        var response = _request ("POST", "", """{"devicetype":"lightsUp#%s"}""".printf (Environment.get_user_name ())).replace ("]", "").replace ("[", "");;
+
+        if (response.contains ("success")) {
+            var parser = new Json.Parser ();
+            parser.load_from_data (response, -1);
+
+            var root_object = parser.get_root ().get_object ();
+
+            if (root_object.has_member ("success")) {
+                user = root_object.get_member ("success").get_object ().get_string_member ("username");
+            }
+        }
     }
 
     public string request (string method, string path, string? body) {

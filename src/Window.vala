@@ -19,6 +19,8 @@
 
 public class LightsUp.Window : Gtk.ApplicationWindow {
 
+    private Gtk.Stack main_stack;
+
     public Window (Gtk.Application app) {
         Object (
             application: app,
@@ -36,6 +38,37 @@ public class LightsUp.Window : Gtk.ApplicationWindow {
             move (x, y);
         }
 
+        main_stack = new Gtk.Stack ();
+        main_stack.homogeneous = false;
+        add (main_stack);
+
+        if (settings.get_string ("user") == "" || settings.get_string ("host") == "") {
+            show_login ();
+        } else {
+            show_app ();
+        }
+    }
+
+    private void show_login () {
+        var grid = new Gtk.Grid ();
+
+        var login_label = new Gtk.Label ("");
+
+        var alert = new Granite.Widgets.AlertView (_("Paring with Hue"), _("Press the Center Button in your Hue Bridge"), Application.APP_ID);
+        grid.add (alert);
+
+        main_stack.add_named (grid, "pair");
+        main_stack.set_visible_child_full ("pair", Gtk.StackTransitionType.OVER_DOWN);
+
+        var endpoint = LightsUp.Api.Endpoint.get_instance ();
+
+        endpoint.logged_in.connect (show_app);
+
+        endpoint.start_login ();
+        show_all ();
+    }
+
+    private void show_app () {
         var grid = new Gtk.Grid ();
         grid.orientation = Gtk.Orientation.VERTICAL;
 
@@ -46,7 +79,9 @@ public class LightsUp.Window : Gtk.ApplicationWindow {
             grid.add (new LightsUp.Widgets.RoomWidget (room, lights));
         };
 
-        add (grid);
+        main_stack.add_named (grid, "main");
         show_all ();
+
+        main_stack.set_visible_child_full ("main", Gtk.StackTransitionType.OVER_DOWN);
     }
 }
