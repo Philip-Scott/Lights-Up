@@ -13,6 +13,7 @@ sources = files(
 
     'Services/Utils.vala',
 
+
     'Application.vala',
     'Main.vala',
     'Window.vala'

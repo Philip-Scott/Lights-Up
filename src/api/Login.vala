@@ -19,6 +19,7 @@
 
 public class LightsUp.Api.Endpoint : Object {
     public signal void logged_in ();
+    public signal void bridge_found (bool value);
 
     public string bridge_ip { get; set; }
     public string user { get; set; }
@@ -42,21 +43,24 @@ public class LightsUp.Api.Endpoint : Object {
     }
 
     public void start_login () {
-        Timeout.add (2000, () => {
-            fetch_user ();
+        new Thread<void*> (null, () => {
+            Timeout.add (2000, () => {
+                fetch_user ();
 
-            if (user != "") {
-                print ("Logged in!\n");
-                logged_in ();
-                return GLib.Source.REMOVE;
-            } else {
-                return GLib.Source.CONTINUE;
-            }
+                if (user != "") {
+                    logged_in ();
+                    return GLib.Source.REMOVE;
+                } else {
+                    return GLib.Source.CONTINUE;
+                }
+            });
+            return null;
         });
     }
 
     private void fetch_user () {
         var response = _request ("POST", "", """{"devicetype":"lightsUp#%s"}""".printf (Environment.get_user_name ())).replace ("]", "").replace ("[", "");;
+        print (response);
 
         if (response.contains ("success")) {
             var parser = new Json.Parser ();
@@ -64,9 +68,13 @@ public class LightsUp.Api.Endpoint : Object {
 
             var root_object = parser.get_root ().get_object ();
 
-            if (root_object.has_member ("success")) {
+            if (root_object != null && root_object.has_member ("success")) {
                 user = root_object.get_member ("success").get_object ().get_string_member ("username");
             }
+        } else if (response.contains ("link button not pressed")) {
+            bridge_found (true);
+        } else {
+            bridge_found (false);
         }
     }
 
@@ -76,11 +84,19 @@ public class LightsUp.Api.Endpoint : Object {
             return "";
         }
 
-        return _request (method, "%s/%s".printf (user, path), body);
+        var response = _request (method, "%s/%s".printf (user, path), body);
+
+        if (response == "") {
+            bridge_found (false);
+        }
+
+        return response;
     }
 
     private string _request (string method, string path, string? body) {
         var session = new Soup.Session ();
+        session.timeout = 2;
+
         var message = new Soup.Message (method, "http://%s/api/%s".printf (bridge_ip, path));
 
         if (body != null) {
