@@ -25,6 +25,7 @@ public class LightsUp.Api.Endpoint : Object {
     public string user { get; set; }
 
     private static Endpoint? instance = null;
+    private LightsUp.RateLimitter rate_limitter;
 
     public static Endpoint get_instance () {
         if (instance == null) {
@@ -40,6 +41,8 @@ public class LightsUp.Api.Endpoint : Object {
         var settings = new GLib.Settings (LightsUp.Application.APP_ID);
         settings.bind ("host", this, "bridge_ip", GLib.SettingsBindFlags.DEFAULT);
         settings.bind ("user", this, "user", GLib.SettingsBindFlags.DEFAULT);
+
+        rate_limitter = new LightsUp.RateLimitter ();
     }
 
     public void start_login () {
@@ -59,8 +62,12 @@ public class LightsUp.Api.Endpoint : Object {
     }
 
     private void fetch_user () {
-        var response = _request ("POST", "", """{"devicetype":"lightsUp#%s"}""".printf (Environment.get_user_name ())).replace ("]", "").replace ("[", "");;
-        print (response);
+        var content = """{"devicetype":"lightsUp#%s"}""".printf (Environment.get_user_name ());
+        _request ("POST", "http://%s/api/".printf (bridge_ip), content, this.login_callback);
+    }
+
+    public void login_callback (string response_) {
+        string response = response_.replace ("]", "").replace ("[", "");
 
         if (response.contains ("success")) {
             var parser = new Json.Parser ();
@@ -78,26 +85,51 @@ public class LightsUp.Api.Endpoint : Object {
         }
     }
 
-    public string request (string method, string path, string? body) {
+    public void request (string method, string path, string? body, RequestCallback callback_func = empty_request) {
         if (user == "") {
             warning ("Not authenticated");
-            return "";
+            return;
         }
 
-        var response = _request (method, "%s/%s".printf (user, path), body);
+        _request (method, "http://%s/api/%s/%s".printf (bridge_ip, user, path), body, callback_func);
 
-        if (response == "") {
-            bridge_found (false);
-        }
-
-        return response;
+        // TOOD: Add error catching
+        //  if (response == "") {
+        //      bridge_found (false);
+        //  }
     }
 
-    private string _request (string method, string path, string? body) {
-        var session = new Soup.Session ();
-        session.timeout = 2;
+    public void empty_request (string response) {}
 
-        var message = new Soup.Message (method, "http://%s/api/%s".printf (bridge_ip, path));
+    private void _request (string method, string path, string? body, RequestCallback callback_func) {
+        var event = new Request (method, path, body);
+        event.callback = callback_func;
+
+        rate_limitter.add (event);
+    }
+}
+
+public delegate void RequestCallback (string response);
+private class Request : QueuedEvent {
+    public string method { get; set; }
+    public string path { get; set; }
+    public string? body { get; set; }
+    public unowned RequestCallback callback;
+
+    public Request (string method, string path, string? body) {
+        Object (
+            id: method + path,
+            method: method,
+            path: path,
+            body: body
+        );
+    }
+
+    public override void run () {
+        var session = new Soup.Session ();
+        session.timeout = 1;
+
+        var message = new Soup.Message (method, path);
 
         if (body != null) {
             message.set_request ("application/json", Soup.MemoryUse.COPY, body.data);
@@ -105,6 +137,11 @@ public class LightsUp.Api.Endpoint : Object {
 
         session.send_message (message);
 
-        return (string) message.response_body.flatten ().data;
+        var response_body = message.response_body;
+
+        if (response_body != null) {
+            var response_data = (string) response_body.flatten ().data;
+            callback (response_data);
+        }
     }
 }

@@ -12,7 +12,7 @@ sources = files(
     'widgets/Scale.vala',
 
     'Services/Utils.vala',
-
+    'Services/RateLimiter.vala',
 
     'Application.vala',
     'Main.vala',

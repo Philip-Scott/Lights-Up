@@ -18,7 +18,7 @@
 */
 
 public class LightsUp.Api.Rooms : Object {
-
+    public signal void rooms_obtained ();
     private static Rooms? instance = null;
 
     public static Rooms get_instance () {
@@ -29,28 +29,30 @@ public class LightsUp.Api.Rooms : Object {
         return instance;
     }
 
-    private Gee.HashMap<string, LightsUp.Model.Room> cache;
+    public Gee.HashMap<string, LightsUp.Model.Room> rooms;
 
     private Rooms () {}
 
-    public Gee.HashMap<string, LightsUp.Model.Room> get_rooms () {
-        var rooms = new Gee.HashMap<string, LightsUp.Model.Room> ();
+    public void get_rooms () {
+        var endpoint = Endpoint.get_instance ();
+        endpoint.request ("GET", "groups", null, this.get_rooms_callback);
+    }
 
+    public void get_rooms_callback (string response) {
         try {
-            var endpoint = Endpoint.get_instance ();
-            var response = endpoint.request ("GET", "groups", null);
-
+            rooms = new Gee.HashMap<string, LightsUp.Model.Room> ();
             var parser = new Json.Parser ();
-			parser.load_from_data (response, -1);
+            parser.load_from_data (response, -1);
 
             var root_object = parser.get_root ().get_object ();
             root_object.foreach_member ((i, name, node) => {
                 var room = new LightsUp.Model.Room (name, node.get_object ());
                 rooms.set (name, room);
             });
-        } catch (Error e) {}
 
-        cache = rooms;
-        return rooms;
+            rooms_obtained ();
+        } catch (Error e) {
+
+        }
     }
 }

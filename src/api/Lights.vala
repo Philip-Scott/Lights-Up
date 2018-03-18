@@ -18,7 +18,7 @@
 */
 
 public class LightsUp.Api.Lights : Object {
-
+    public signal void lights_obtained ();
     private static Lights? instance = null;
 
     public static Lights get_instance () {
@@ -29,17 +29,19 @@ public class LightsUp.Api.Lights : Object {
         return instance;
     }
 
-    private Gee.HashMap<string, LightsUp.Model.Light> cache;
+    public Gee.HashMap<string, LightsUp.Model.Light> lights;
 
     private Lights () {}
 
-    public Gee.HashMap<string, LightsUp.Model.Light> get_lights () {
-        var lights = new Gee.HashMap<string, LightsUp.Model.Light> ();
+    public void get_lights () {
+        var endpoint = Endpoint.get_instance ();
+        endpoint.request ("GET", "lights", null, this.get_lights_callback);
+    }
+
+    private void get_lights_callback (string response) {
+        lights = new Gee.HashMap<string, LightsUp.Model.Light> ();
 
         try {
-            var endpoint = Endpoint.get_instance ();
-            var response = endpoint.request ("GET", "lights", null);
-
             var parser = new Json.Parser ();
 			parser.load_from_data (response, -1);
 
@@ -50,7 +52,6 @@ public class LightsUp.Api.Lights : Object {
             });
         } catch (Error e) {}
 
-        cache = lights;
-        return lights;
+        lights_obtained ();
     }
 }

@@ -120,26 +120,37 @@ public class LightsUp.Window : Gtk.ApplicationWindow {
             }
         });
 
-        var lights = Api.Lights.get_instance ().get_lights ();
+        var lights_api = Api.Lights.get_instance ();
+        lights_api.lights_obtained.connect (() => {
+            print ("Lights obtained signal\n");
 
-        if (lights.size < 0) {
-            show_error (_("No lights found"), _("Setup your lights from the official app"));
-            return;
-        }
+            var lights = lights_api.lights;
+            if (lights.size < 0) {
+                show_error (_("No lights found"), _("Setup your lights from the official app"));
+                return;
+            }
 
-        var rooms = Api.Rooms.get_instance ().get_rooms ();
+            var rooms_api = Api.Rooms.get_instance ();
 
-        bool found = false;
-        foreach (var room in rooms.values) {
-            grid.add (new LightsUp.Widgets.RoomWidget (room, lights));
-            found = true;
-        };
+            rooms_api.rooms_obtained.connect (() => {
+                var rooms = rooms_api.rooms;
 
-        if (!found) return;
+                bool found = false;
+                foreach (var room in rooms.values) {
+                    grid.add (new LightsUp.Widgets.RoomWidget (room, lights));
+                    found = true;
+                };
 
-        main_stack.add_named (grid, "main");
-        show_all ();
+                if (!found) return;
+                main_stack.add_named (grid, "main");
+                show_all ();
 
-        main_stack.set_visible_child_full ("main", Gtk.StackTransitionType.OVER_DOWN);
+                main_stack.set_visible_child_full ("main", Gtk.StackTransitionType.OVER_DOWN);
+            });
+
+            rooms_api.get_rooms ();
+        });
+
+        lights_api.get_lights ();
     }
 }
