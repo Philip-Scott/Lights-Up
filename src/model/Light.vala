@@ -48,8 +48,8 @@ public class LightsUp.Model.Light : Object {
         get {
             return (int) state.get_int_member ("bri");
         } set {
-            update_property ("bri", value.to_string ());
             state.set_int_member ("bri", value);
+            update_property ("bri", value.to_string ());
         }
     }
 
@@ -57,8 +57,8 @@ public class LightsUp.Model.Light : Object {
         get {
             return (int) state.get_int_member ("ct");
         } set {
-            update_property ("ct", value.to_string ());
             state.set_int_member ("ct", value);
+            update_property ("ct", value.to_string ());
         }
     }
 
@@ -66,8 +66,8 @@ public class LightsUp.Model.Light : Object {
         get {
             return state.get_boolean_member ("on");
         } set {
-            update_property ("on", value.to_string ());
             state.set_boolean_member ("on", value);
+            update_property ("on", value.to_string ());
         }
     }
 
@@ -96,38 +96,21 @@ public class LightsUp.Model.Light : Object {
 
         var body = "{\"%s\": %s}".printf (property, value);
 
-        endpoint.request ("PUT", path, body);
+        endpoint.request ("PUT", path, body, update_callback);
+        updated ();
+    }
+
+    public void update_callback (string response) {
+        debug ("Light: %s\n", response);
     }
 
     public string get_css_color () {
-        if (!reachable) {
+        if (!reachable || !on) {
             return "rgba(40, 40, 40, 0.3)";
         }
 
         if (color_mode == "ct") {
-            double percent = (double) (color_temperature - 153) / (454.0 - 153.0);
-
-            Gdk.RGBA color1, color2;
-            if (percent < 0.5) {
-                percent = percent * 2.0;
-
-                color1 = { 135.0 / 255.0, 183.0 / 255.0, 255.0 / 255.0, 1.0 }; // blue
-                color2 = { 237.0 / 255.0, 203.0 / 255.0, 175.0 / 255.0, 1.0 }; // light orange
-            } else {
-                percent = (percent - 0.5) * 2.0;
-
-                color1 = { 237.0 / 255.0, 181.0 / 255.0, 135.0 / 255.0, 1.0 }; // light orange
-                color2 = { 249.0 / 255.0, 87.0  / 255.0, 87.0  / 255.0, 1.0 }; // light red
-            }
-
-            Gdk.RGBA final_color = {
-                (color1.red * (1 - percent) + color2.red * percent),
-                (color1.green * (1 - percent) + color2.green * percent),
-                (color1.blue * (1 - percent) + color2.blue * percent),
-                ((double) brightness / 255.0).clamp (0.3, 1.0)
-            };
-
-            return final_color.to_string ();
+            return LightsUp.Utils.ct_to_css ((double) color_temperature, (double) brightness);
         }
 
         return @"rgba(255, 208, 43, $(((double) brightness / 255.0).clamp (0.3, 1.0)))";

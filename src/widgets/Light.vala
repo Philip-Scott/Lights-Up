@@ -80,6 +80,8 @@ public class LightsUp.Widgets.LightWidget : Gtk.Grid {
         reachable = light.reachable;
         show_all ();
         set_color ();
+
+        light.updated.connect (set_color);
     }
 
     private void set_color () {

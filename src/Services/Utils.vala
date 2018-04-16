@@ -39,4 +39,30 @@ public class LightsUp.Utils {
         widget.visible = value;
         widget.no_show_all = !value;
     }
+
+    public static string ct_to_css (double color_temperature, double brightness) {
+        double percent = (color_temperature - 153.0) / (454.0 - 153.0);
+
+        Gdk.RGBA color1, color2;
+        if (percent < 0.5) {
+            percent = percent * 2.0;
+
+            color1 = { 135.0 / 255.0, 183.0 / 255.0, 255.0 / 255.0, 1.0 }; // blue
+            color2 = { 237.0 / 255.0, 203.0 / 255.0, 175.0 / 255.0, 1.0 }; // light orange
+        } else {
+            percent = (percent - 0.5) * 2.0;
+
+            color1 = { 237.0 / 255.0, 181.0 / 255.0, 135.0 / 255.0, 1.0 }; // light orange
+            color2 = { 249.0 / 255.0, 87.0  / 255.0, 87.0  / 255.0, 1.0 }; // light red
+        }
+
+        Gdk.RGBA final_color = {
+            (color1.red * (1.0 - percent) + color2.red * percent),
+            (color1.green * (1.0 - percent) + color2.green * percent),
+            (color1.blue * (1.0 - percent) + color2.blue * percent),
+            (brightness / 255.0).clamp (0.3, 1.0)
+        };
+
+        return final_color.to_string ();
+    }
 }

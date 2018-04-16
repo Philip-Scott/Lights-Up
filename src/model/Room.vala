@@ -38,8 +38,8 @@ public class LightsUp.Model.Room : Object {
         get {
             return (int) action.get_int_member ("bri");
         } set {
-            update_property ("bri", value.to_string ());
             action.set_int_member ("bri", value);
+            update_property ("bri", value.to_string ());
         }
     }
 
@@ -47,8 +47,8 @@ public class LightsUp.Model.Room : Object {
         get {
             return (int) action.get_int_member ("ct");
         } set {
-            update_property ("ct", value.to_string ());
             action.set_int_member ("ct", value);
+            update_property ("ct", value.to_string ());
         }
     }
 
@@ -68,8 +68,8 @@ public class LightsUp.Model.Room : Object {
         get {
             return action.get_boolean_member ("on");
         } set {
-            update_property ("on", value.to_string ());
             action.set_boolean_member ("on", value);
+            update_property ("on", value.to_string ());
         }
     }
 
@@ -98,7 +98,12 @@ public class LightsUp.Model.Room : Object {
 
         var body = "{\"%s\": %s}".printf (property, value);
 
-        endpoint.request ("PUT", path, body);
+        endpoint.request ("PUT", path, body, update_callback);
+        updated ();
+    }
+
+    public void update_callback (string response) {
+        debug ("Room update: %s\n", response);
     }
 
     public void update () {
@@ -106,7 +111,7 @@ public class LightsUp.Model.Room : Object {
 
         var path = "groups/%s/".printf (id);
 
-        endpoint.request ("GET", path, null);
+        endpoint.request ("GET", path, null, update_callback);
     }
 
     public Gee.LinkedList<string> get_lights () {
@@ -116,5 +121,17 @@ public class LightsUp.Model.Room : Object {
         });
 
         return list;
+    }
+
+    public string get_css_color () {
+        if (!on) {
+            return "rgba(40, 40, 40, 0.3)";
+        }
+
+        if (has_temperature) {
+            return LightsUp.Utils.ct_to_css ((double) color_temperature, (double) brightness);
+        }
+
+        return @"rgba(255, 208, 43, $(((double) brightness / 255.0).clamp (0.3, 1.0)))";
     }
 }

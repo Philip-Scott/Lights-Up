@@ -42,6 +42,9 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
     }
 
     public bool any_reachable {
+        get {
+            return light_switch.sensitive;
+        }
         set {
             if (value) {
                 reachable_stack.set_visible_child_name ("brightness");
@@ -55,6 +58,7 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
 
     public RoomWidget (LightsUp.Model.Room room, Gee.HashMap<string, LightsUp.Model.Light> _lights) {
         Object (room: room);
+        room.updated.connect (set_color);
 
         var light_ids = room.get_lights ();
         this.lights = new Gee.LinkedList<LightsUp.Model.Light> ();
@@ -136,11 +140,18 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
     }
 
     private void set_color () {
-        string color = "#aaa";
-        // TODO: Make gradient if more than one color
-        foreach (var light in lights) {
-            color = light.get_css_color ();
+        string color;
+
+        if (any_reachable) {
+            color = room.get_css_color ();
+        } else {
+            color = "rgba(40, 40, 40, 0.3)";
         }
+
+        // TODO: Make gradient if more than one color
+        //  foreach (var light in lights) {
+        //      color = light.get_css_color ();
+        //  }
 
         var CSS = ".room-icon {color: %s; }";
         LightsUp.Utils.set_style (image, CSS.printf (color));
