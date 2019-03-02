@@ -66,7 +66,7 @@ public class LightsUp.Widgets.Popover : Gtk.Popover {
         } else {
             brightness = new LightsUp.Widgets.Scale.room_brightness (room);
 
-            if (room.has_temperature) {
+            if (room.action.colormode == "ct") {
                 temp_scale = new LightsUp.Widgets.Scale.room_temp (room);
                 temp_scale.margin_bottom = 6;
 

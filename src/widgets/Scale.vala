@@ -23,9 +23,9 @@ public class LightsUp.Widgets.Scale : Gtk.Scale {
         set_range (153, 454);
 
         get_style_context ().add_class ("temperature");
-        set_value (room.color_temperature);
+        set_value (room.action.ct);
         value_changed.connect (() => {
-            room.color_temperature = (int) get_value ();
+            room.action.ct = (int) get_value ();
         });
     }
 
@@ -42,9 +42,9 @@ public class LightsUp.Widgets.Scale : Gtk.Scale {
     public Scale.room_brightness (LightsUp.Model.Room room) {
         set_range (0, 255);
 
-        set_value (room.brightness);
+        set_value (room.action.bri);
         value_changed.connect (() => {
-            room.brightness = (int) get_value ();
+            room.action.bri = (int) get_value ();
         });
     }
 

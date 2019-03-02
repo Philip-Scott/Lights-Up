@@ -46,7 +46,7 @@ public class LightsUp.Api.Rooms : Object {
 
             var root_object = parser.get_root ().get_object ();
             root_object.foreach_member ((i, name, node) => {
-                var room = new LightsUp.Model.Room (name, node.get_object ());
+                var room = new LightsUp.Model.Room (node.get_object (), name);
                 rooms.set (name, room);
             });
 

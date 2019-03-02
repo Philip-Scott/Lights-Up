@@ -53,8 +53,6 @@ public class LightsUp.Model.Light : JsonObject {
         }
 
         protected override void api_call (string key) {
-            print ("State api: %s\n", key);
-
             var endpoint = LightsUp.Api.Endpoint.get_instance ();
 
             var path = "lights/%s/state".printf (((Light) parent_object).api_id);

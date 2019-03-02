@@ -19,7 +19,7 @@
 public abstract class LightsUp.Model.JsonObject : GLib.Object {
 
     [Signal (no_recurse = true, run = "first", action = true, no_hooks = true, detailed = true)]
-    public signal void changed ();
+    public signal void changed (string changed_property);
 
     public Json.Object object { get; construct; }
     public JsonObject? parent_object { get; construct; default = null; }
@@ -43,7 +43,6 @@ public abstract class LightsUp.Model.JsonObject : GLib.Object {
     }
 
     void handle_notify (Object sender, ParamSpec property) {
-
         notify.disconnect (handle_notify);
         call_verify (property.name);
         notify.connect (handle_notify);
@@ -55,7 +54,7 @@ public abstract class LightsUp.Model.JsonObject : GLib.Object {
         }
 
         api_call (key);
-        changed[key] ();
+        changed (key);
     }
 
     protected virtual void api_call (string key)    {
@@ -68,8 +67,20 @@ public abstract class LightsUp.Model.JsonObject : GLib.Object {
         }
 
         string get_key = key;
-        if (get_key == "type-") {
-            get_key = "type";
+        switch (key) {
+            case "type-":
+                get_key = "type";
+                break;
+            case "any-on":
+                get_key = "any_on";
+                break;
+            case "all-on":
+                get_key = "all_on";
+                break;
+        }
+
+        if (!object.has_member (get_key)) {
+            return;
         }
 
         var obj_class = (ObjectClass) get_type ().class_ref ();
@@ -79,9 +90,6 @@ public abstract class LightsUp.Model.JsonObject : GLib.Object {
         var val = Value (type);
         this.get_property (prop.name.down (), ref val);
 
-        if (!object.has_member (get_key)) {
-            return;
-        }
 
         if (val.type () == prop.value_type) {
             if (type == typeof (int))
@@ -99,6 +107,12 @@ public abstract class LightsUp.Model.JsonObject : GLib.Object {
             else if (type.is_a (typeof (JsonObject))) {
                 var object = object.get_object_member (get_key);
                 set_property (prop.name, Object.new (type, "object", object, "parent-object", this));
+            } else if (type == typeof (string[])) {
+                var list = new Gee.LinkedList<string> ();
+                object.get_array_member (get_key).get_elements ().foreach ((node) => {
+                    list.add (node.get_string ());
+                });
+                set_property (prop.name, list.to_array ());
             }
         } else {
             print ("Unsupported settings type '%s' in object\n", type.name ());

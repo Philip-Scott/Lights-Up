@@ -81,11 +81,10 @@ public class LightsUp.Widgets.LightWidget : Gtk.Grid {
         show_all ();
         set_color ();
 
-        light.changed.connect (set_color);
+        light.state.changed.connect (set_color);
     }
 
     private void set_color () {
-        print ("Light changed\n");
         var color = light.get_css_color ();
         var CSS = ".light-icon {color: %s; }";
 

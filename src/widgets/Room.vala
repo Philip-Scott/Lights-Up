@@ -20,7 +20,7 @@
 public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
     public string id {
         get {
-            return room.id;
+            return room.api_id;
         }
     }
 
@@ -58,9 +58,9 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
 
     public RoomWidget (LightsUp.Model.Room room, Gee.HashMap<string, LightsUp.Model.Light> _lights) {
         Object (room: room);
-        room.updated.connect (set_color);
+        room.action.changed.connect (set_color);
 
-        var light_ids = room.get_lights ();
+        var light_ids = room.lights;
         this.lights = new Gee.LinkedList<LightsUp.Model.Light> ();
 
         bool any_reach = false;
@@ -68,7 +68,7 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
             var light = _lights.get (id);
             this.lights.add (light);
 
-            if (light_ids.size > 1) {
+            if (light_ids.length > 1) {
                 childs.add (new LightsUp.Widgets.LightWidget (light));
             }
 
@@ -93,15 +93,15 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
         brightness = new LightsUp.Widgets.Scale.room_brightness (room);
 
         light_switch = new Gtk.Switch ();
-        light_switch.set_active (room.any_on);
+        light_switch.set_active (room.state.any_on);
         light_switch.valign = Gtk.Align.CENTER;
 
         light_switch.state_set.connect ((state) => {
-            room.on = state;
-            active =  state;
+            room.action.on = state;
+            active = state;
         });
 
-        active = room.any_on;
+        active = room.state.any_on;
 
         image = new Gtk.Image.from_icon_name ("room-icon-symbolic", Gtk.IconSize.DIALOG);
         image.get_style_context ().add_class ("room-icon");
