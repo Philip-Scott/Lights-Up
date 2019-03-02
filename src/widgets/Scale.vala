@@ -33,9 +33,9 @@ public class LightsUp.Widgets.Scale : Gtk.Scale {
         set_range (153, 454);
 
         get_style_context ().add_class ("temperature");
-        set_value (light.color_temperature);
+        set_value (light.state.ct);
         value_changed.connect (() => {
-            light.color_temperature = (int) get_value ();
+            light.state.ct = (int) get_value ();
         });
     }
 
@@ -51,9 +51,9 @@ public class LightsUp.Widgets.Scale : Gtk.Scale {
     public Scale.light_brightness (LightsUp.Model.Light light) {
         set_range (0, 255);
 
-        set_value (light.brightness);
+        set_value (light.state.bri);
         value_changed.connect (() => {
-            light.brightness = (int) get_value ();
+            light.state.bri = (int) get_value ();
         });
     }
 

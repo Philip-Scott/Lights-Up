@@ -72,7 +72,7 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
                 childs.add (new LightsUp.Widgets.LightWidget (light));
             }
 
-            if (light.reachable) {
+            if (light.state.reachable) {
                 any_reach = true;
             }
         }

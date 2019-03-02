@@ -1,21 +1,21 @@
 /*
-* Copyright (c) 2017
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program; if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA
-*/
+ *  Copyright (C) 2019 Felipe Escoto <felescoto95@hotmail.com>
+ *
+ *  This program or library is free software; you can redistribute it
+ *  and/or modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 3 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General
+ *  Public License along with this library; if not, write to the
+ *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ *  Boston, MA 02110-1301 USA.
+ */
 
 public class LightsUp.Widgets.LightWidget : Gtk.Grid {
 
@@ -51,10 +51,10 @@ public class LightsUp.Widgets.LightWidget : Gtk.Grid {
 
         light_switch = new Gtk.Switch ();
         light_switch.valign = Gtk.Align.CENTER;
-        light_switch.set_active (light.on);
+        light_switch.set_active (light.state.on);
 
         light_switch.state_set.connect ((state) => {
-            light.on = state;
+            light.state.on = state;
         });
 
         var event_box = new Gtk.EventBox ();
@@ -77,14 +77,15 @@ public class LightsUp.Widgets.LightWidget : Gtk.Grid {
         add (label);
         add (light_switch);
 
-        reachable = light.reachable;
+        reachable = light.state.reachable;
         show_all ();
         set_color ();
 
-        light.updated.connect (set_color);
+        light.changed.connect (set_color);
     }
 
     private void set_color () {
+        print ("Light changed\n");
         var color = light.get_css_color ();
         var CSS = ".light-icon {color: %s; }";
 

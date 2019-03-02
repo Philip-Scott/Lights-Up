@@ -46,8 +46,10 @@ public class LightsUp.Api.Lights : Object {
 			parser.load_from_data (response, -1);
 
             var root_object = parser.get_root ().get_object ();
+            bool first = true;
             root_object.foreach_member ((i, name, node) => {
-                var light = new LightsUp.Model.Light (name, node.get_object ());
+                var light = new LightsUp.Model.Light (node.get_object (), name);
+
                 lights.set (name, light);
             });
         } catch (Error e) {}
