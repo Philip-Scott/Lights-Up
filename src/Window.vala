@@ -35,10 +35,14 @@ public class LightsUp.Window : Gtk.ApplicationWindow {
         settings = new GLib.Settings (LightsUp.Application.APP_ID);
         int x = settings.get_int ("window-x");
         int y = settings.get_int ("window-y");
+        int w = settings.get_int ("window-w");
+        int h = settings.get_int ("window-h");
 
         if (x != -1 && y != -1) {
             move (x, y);
         }
+
+        resize (w, h);
 
         main_stack = new Gtk.Stack ();
         main_stack.homogeneous = false;
@@ -49,6 +53,20 @@ public class LightsUp.Window : Gtk.ApplicationWindow {
         } else {
             show_app ();
         }
+    }
+
+    protected override bool delete_event (Gdk.EventAny event) {
+        int width, height, x, y;
+
+        get_size (out width, out height);
+        get_position (out x, out y);
+
+        settings.set_int ("window-x", x);
+        settings.set_int ("window-y", y);
+        settings.set_int ("window-w", width);
+        settings.set_int ("window-h", height);
+
+        return false;
     }
 
     private void show_login () {
