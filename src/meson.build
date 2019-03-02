@@ -3,18 +3,18 @@ sources = files(
     'api/Lights.vala',
     'api/Rooms.vala',
 
-    'model/JsonObject.vala',
-    'model/Light.vala',
-    'model/Room.vala',
+    'Model/JsonObject.vala',
+    'Model/Light.vala',
+    'Model/Room.vala',
 
     'Views/GroupsView.vala',
     'Views/LightsView.vala',
 
-    'widgets/Light.vala',
-    'widgets/Room.vala',
-    'widgets/Popover.vala',
-    'widgets/Scale.vala',
-    'widgets/ViewSelector.vala',
+    'Widgets/Light.vala',
+    'Widgets/Room.vala',
+    'Widgets/Popover.vala',
+    'Widgets/Scale.vala',
+    'Widgets/ViewSelector.vala',
 
     'Services/Utils.vala',
     'Services/RateLimiter.vala',
