@@ -122,8 +122,27 @@ public class LightsUp.Window : Gtk.ApplicationWindow {
     }
 
     public void show_app () {
+        var app_stack = new Gtk.Stack ();
+        app_stack.homogeneous = false;
+        app_stack.expand = true;
+
         var grid = new Gtk.Grid ();
-        grid.orientation = Gtk.Orientation.VERTICAL;
+        grid.orientation = Gtk.Orientation.HORIZONTAL;
+        grid.expand = true;
+
+        var view_selector = new LightsUp.Widget.ViewSelector ();
+        view_selector.view_requested.connect ((view) => {
+            app_stack.set_visible_child_full (view, Gtk.StackTransitionType.OVER_DOWN);
+        });
+
+        var separator = new Gtk.Separator (Gtk.Orientation.VERTICAL);
+        separator.vexpand = true;
+
+        grid.add (view_selector);
+        grid.add (separator);
+        grid.add (app_stack);
+
+        main_stack.add_named (grid, "main-view");
 
         var endpoint = LightsUp.Api.Endpoint.get_instance ();
         endpoint.bridge_found.connect ((value) => {
@@ -149,8 +168,15 @@ public class LightsUp.Window : Gtk.ApplicationWindow {
             }
 
             var groups_view = new LightsUp.Views.GroupsView ();
-            main_stack.add_named (groups_view, "groups");
-            main_stack.set_visible_child_full ("groups", Gtk.StackTransitionType.OVER_DOWN);
+            app_stack.add_named (groups_view, "groups");
+            app_stack.set_visible_child_full ("groups", Gtk.StackTransitionType.OVER_DOWN);
+
+            var lights_view = new LightsUp.Views.LightsView ();
+            app_stack.add_named (lights_view, "lights");
+            app_stack.set_visible_child_full ("lights", Gtk.StackTransitionType.OVER_DOWN);
+
+            main_stack.set_visible_child_full ("main-view", Gtk.StackTransitionType.OVER_DOWN);
+            show_all ();
         });
 
         lights_api.get_lights ();

@@ -17,14 +17,15 @@
  *  Boston, MA 02110-1301 USA.
  */
 
-public class LightsUp.Views.GroupsView : Gtk.ScrolledWindow {
+public class LightsUp.Views.LightsView : Gtk.ScrolledWindow {
 
-    public GroupsView () {
+    public LightsView () {
         Object (hscrollbar_policy: Gtk.PolicyType.NEVER);
     }
 
     construct {
         expand = true;
+
         get_style_context ().add_class ("view");
 
         var grid = new Gtk.Grid ();
@@ -33,22 +34,11 @@ public class LightsUp.Views.GroupsView : Gtk.ScrolledWindow {
         var lights_api = Api.Lights.get_instance ();
         var lights = lights_api.lights;
 
-        var rooms_api = Api.Rooms.get_instance ();
-        rooms_api.rooms_obtained.connect (() => {
-            var rooms = rooms_api.rooms;
+        foreach (var light in lights.values) {
+            grid.add (new LightsUp.Widgets.LightWidget (light));
+        };
 
-            bool found = false;
-            foreach (var room in rooms.values) {
-                grid.add (new LightsUp.Widgets.RoomWidget (room, lights));
-                found = true;
-            };
-
-            if (!found) return;
-            show_all ();
-        });
-
-        rooms_api.get_rooms ();
-
+        show_all ();
         add (grid);
     }
 }

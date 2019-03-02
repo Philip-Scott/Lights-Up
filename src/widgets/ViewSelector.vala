@@ -17,38 +17,30 @@
  *  Boston, MA 02110-1301 USA.
  */
 
-public class LightsUp.Views.GroupsView : Gtk.ScrolledWindow {
+public class LightsUp.Widget.ViewSelector : Gtk.Grid {
+    public signal void view_requested (string view);
 
-    public GroupsView () {
-        Object (hscrollbar_policy: Gtk.PolicyType.NEVER);
+    public ViewSelector () {
+
     }
 
     construct {
-        expand = true;
-        get_style_context ().add_class ("view");
+        orientation = Gtk.Orientation.VERTICAL;
+        row_spacing = 8;
 
-        var grid = new Gtk.Grid ();
-        grid.orientation = Gtk.Orientation.VERTICAL;
+        //  build_button ("non-starred-symbolic", "groups");
+        build_button ("emblem-shared-symbolic", "groups");
+        build_button ("preferences-system-power-symbolic", "lights");
+    }
 
-        var lights_api = Api.Lights.get_instance ();
-        var lights = lights_api.lights;
+    private void build_button (string icon, string view) {
+        var button = new Gtk.Button.from_icon_name (icon, Gtk.IconSize.DIALOG);
+        button.get_style_context ().add_class ("flat");
 
-        var rooms_api = Api.Rooms.get_instance ();
-        rooms_api.rooms_obtained.connect (() => {
-            var rooms = rooms_api.rooms;
-
-            bool found = false;
-            foreach (var room in rooms.values) {
-                grid.add (new LightsUp.Widgets.RoomWidget (room, lights));
-                found = true;
-            };
-
-            if (!found) return;
-            show_all ();
+        button.clicked.connect (() => {
+            view_requested (view);
         });
 
-        rooms_api.get_rooms ();
-
-        add (grid);
+        add (button);
     }
 }
