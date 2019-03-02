@@ -15,6 +15,7 @@ sources = files(
     'Widgets/Popover.vala',
     'Widgets/Scale.vala',
     'Widgets/ViewSelector.vala',
+    'Widgets/ControllerLarge.vala',
 
     'Services/Utils.vala',
     'Services/RateLimiter.vala',

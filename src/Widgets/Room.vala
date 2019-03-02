@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2017
+* Copyright (c) 2019
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -17,8 +17,8 @@
 * Boston, MA 02110-1301 USA
 */
 
-public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
-    public string id {
+public class LightsUp.Widgets.RoomWidget : LightsUp.Widgets.ControllerLarge {
+    private string id {
         get {
             return room.api_id;
         }
@@ -27,13 +27,6 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
     public LightsUp.Model.Room room { get; construct set; }
 
     private Gee.LinkedList<LightsUp.Model.Light> lights;
-
-    private Gtk.Stack reachable_stack;
-
-    private Gtk.Scale brightness;
-    private Gtk.Grid childs;
-    private Gtk.Image image;
-    private Gtk.Switch light_switch;
 
     public bool active {
         set {
@@ -58,6 +51,7 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
 
     public RoomWidget (LightsUp.Model.Room room, Gee.HashMap<string, LightsUp.Model.Light> _lights) {
         Object (room: room);
+
         room.action.changed.connect (set_color);
 
         var light_ids = room.lights;
@@ -77,40 +71,19 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
             }
         }
 
-        any_reachable = any_reach;
-        set_color ();
-    }
-
-    construct {
-        column_spacing = 6;
-        margin = 6;
-
-        var label = new Gtk.Label (room.name);
-        label.get_style_context ().add_class ("h3");
-        label.get_style_context ().add_class ("h4");
-        label.halign = Gtk.Align.START;
-
         brightness = new LightsUp.Widgets.Scale.room_brightness (room);
+        reachable_stack.add_named (brightness, "brightness");
 
-        light_switch = new Gtk.Switch ();
+        title_label.label = room.name;
+
         light_switch.set_active (room.state.any_on);
-        light_switch.valign = Gtk.Align.CENTER;
-
         light_switch.state_set.connect ((state) => {
             room.action.on = state;
             active = state;
+            return false;
         });
 
-        active = room.state.any_on;
-
-        image = new Gtk.Image.from_icon_name ("room-icon-symbolic", Gtk.IconSize.DIALOG);
-        image.get_style_context ().add_class ("room-icon");
-
-        var event_box = new Gtk.EventBox ();
-        event_box.events += Gdk.EventMask.BUTTON_PRESS_MASK;
-        event_box.add (image);
-
-        event_box.button_press_event.connect (() => {
+        image_event_box.button_press_event.connect (() => {
             var popover = new Popover.for_room (room);
             popover.relative_to = image;
 
@@ -118,25 +91,12 @@ public class LightsUp.Widgets.RoomWidget : Gtk.Grid {
             return false;
         });
 
-        childs = new Gtk.Grid ();
-        childs.orientation = Gtk.Orientation.VERTICAL;
-
-        var no_lights_label = new Gtk.Label ("<small>Unreachable</small>");
-        no_lights_label.halign = Gtk.Align.START;
-        no_lights_label.use_markup = true;
-        no_lights_label.sensitive = false;
-
-        reachable_stack = new Gtk.Stack ();
-        reachable_stack.add_named (brightness, "brightness");
-        reachable_stack.add_named (no_lights_label, "non_reachable");
-
-        attach (event_box, 0, 0, 1, 2);
-        attach (label, 1, 0, 1, 1);
-        attach (reachable_stack, 1, 1, 1, 1);
-        attach (light_switch, 2, 0, 1, 2);
-        attach (childs, 0, 2, 3, 1);
-
         show_all ();
+
+        any_reachable = any_reach;
+        active = room.state.any_on;
+
+        set_color ();
     }
 
     private void set_color () {
