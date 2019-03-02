@@ -6,7 +6,7 @@ sources = files(
     'model/JsonObject.vala',
     'model/Light.vala',
     'model/Room.vala',
-
+    'Views/GroupsView.vala',
 
     'widgets/Light.vala',
     'widgets/Room.vala',

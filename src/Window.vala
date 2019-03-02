@@ -121,7 +121,7 @@ public class LightsUp.Window : Gtk.ApplicationWindow {
         show_all ();
     }
 
-    private void show_app () {
+    public void show_app () {
         var grid = new Gtk.Grid ();
         grid.orientation = Gtk.Orientation.VERTICAL;
 
@@ -148,25 +148,9 @@ public class LightsUp.Window : Gtk.ApplicationWindow {
                 return;
             }
 
-            var rooms_api = Api.Rooms.get_instance ();
-
-            rooms_api.rooms_obtained.connect (() => {
-                var rooms = rooms_api.rooms;
-
-                bool found = false;
-                foreach (var room in rooms.values) {
-                    grid.add (new LightsUp.Widgets.RoomWidget (room, lights));
-                    found = true;
-                };
-
-                if (!found) return;
-                main_stack.add_named (grid, "main");
-                show_all ();
-
-                main_stack.set_visible_child_full ("main", Gtk.StackTransitionType.OVER_DOWN);
-            });
-
-            rooms_api.get_rooms ();
+            var groups_view = new LightsUp.Views.GroupsView ();
+            main_stack.add_named (groups_view, "groups");
+            main_stack.set_visible_child_full ("groups", Gtk.StackTransitionType.OVER_DOWN);
         });
 
         lights_api.get_lights ();
