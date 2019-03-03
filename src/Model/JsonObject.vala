@@ -24,17 +24,18 @@ public abstract class LightsUp.Model.JsonObject : GLib.Object {
     public Json.Object object { get; construct; }
     public JsonObject? parent_object { get; construct; default = null; }
 
+    private ObjectClass obj_class;
+
     public JsonObject.from_object (Json.Object object) {
         Object (object: object);
     }
 
     construct {
-        debug ("Loading json object settings");
+        obj_class = (ObjectClass) get_type ().class_ref ();
 
-        var obj_class = (ObjectClass) get_type ().class_ref ();
         var properties = obj_class.list_properties ();
         foreach (var prop in properties) {
-            load_key (prop.name);
+            load_key (prop.name, object);
         }
     }
 
@@ -44,8 +45,10 @@ public abstract class LightsUp.Model.JsonObject : GLib.Object {
 
     void handle_notify (Object sender, ParamSpec property) {
         notify.disconnect (handle_notify);
+
         save_on_object (property.name);
         call_verify (property.name);
+
         notify.connect (handle_notify);
     }
 
@@ -59,58 +62,59 @@ public abstract class LightsUp.Model.JsonObject : GLib.Object {
     }
 
     protected virtual void api_call (string key)    {
-
     }
 
-    private void load_key (string key) {
+    /**
+     * Used when a JSON Property has a different name than a GObject property.
+     * This should return the name of the JSON property that you want to get from a gobject string.
+     *
+     * For example. GObject properties internally use "-" instead of "_"
+     */
+    protected virtual string key_override (string key) {
+        return key;
+    }
+
+    private void load_key (string key, Json.Object source_object) {
         if (key == "object" || key == "parent-object") {
             return;
         }
 
-        string get_key = key;
-        switch (key) {
-            case "type-":
-                get_key = "type";
-                break;
-            case "any-on":
-                get_key = "any_on";
-                break;
-            case "all-on":
-                get_key = "all_on";
-                break;
-        }
+        string get_key = key_override (key);
 
-        if (!object.has_member (get_key)) {
+        if (!source_object.has_member (get_key)) {
             return;
         }
 
-        var obj_class = (ObjectClass) get_type ().class_ref ();
         var prop = obj_class.find_property (key);
 
         var type = prop.value_type;
         var val = Value (type);
         this.get_property (prop.name.down (), ref val);
 
-
         if (val.type () == prop.value_type) {
             if (type == typeof (int))
-                set_property (prop.name, (int) object.get_int_member (get_key));
+                set_property (prop.name, (int) source_object.get_int_member (get_key));
             else if (type == typeof (uint))
-                set_property (prop.name, (uint) object.get_int_member (get_key));
+                set_property (prop.name, (uint) source_object.get_int_member (get_key));
             else if (type == typeof (double))
-                set_property (prop.name, object.get_double_member (get_key));
+                set_property (prop.name, source_object.get_double_member (get_key));
             else if (type == typeof (string))
-                set_property (prop.name, object.get_string_member (get_key));
+                set_property (prop.name, source_object.get_string_member (get_key));
             else if (type == typeof (bool))
-                set_property (prop.name, object.get_boolean_member (get_key));
+                set_property (prop.name, source_object.get_boolean_member (get_key));
             else if (type == typeof (int64))
-                set_property (prop.name, object.get_int_member (get_key));
+                set_property (prop.name, source_object.get_int_member (get_key));
             else if (type.is_a (typeof (JsonObject))) {
-                var object = object.get_object_member (get_key);
-                set_property (prop.name, Object.new (type, "object", object, "parent-object", this));
+                var object = source_object.get_object_member (get_key);
+                if (val.get_object () == null) {
+                    set_property (prop.name, Object.new (type, "object", object, "parent-object", this));
+                } else {
+                    var json_object = (JsonObject) val.get_object ();
+                    json_object.override_properties_from_json (object);
+                }
             } else if (type == typeof (string[])) {
                 var list = new Gee.LinkedList<string> ();
-                object.get_array_member (get_key).get_elements ().foreach ((node) => {
+                source_object.get_array_member (get_key).get_elements ().foreach ((node) => {
                     list.add (node.get_string ());
                 });
                 set_property (prop.name, list.to_array ());
@@ -121,7 +125,6 @@ public abstract class LightsUp.Model.JsonObject : GLib.Object {
     }
 
     protected string get_string_property (string key) {
-        var obj_class = (ObjectClass) get_type ().class_ref ();
         var prop = obj_class.find_property (key);
 
         var type = prop.value_type;
@@ -146,25 +149,16 @@ public abstract class LightsUp.Model.JsonObject : GLib.Object {
         assert_not_reached ();
     }
 
+    /*
+    * Runs when you set a vala property on the object to store the value in the internal JSON class
+    */
     private void save_on_object (string key) {
         if (key == "object" || key == "parent-object") {
             return;
         }
 
-        string get_key = key;
-        switch (key) {
-            case "type-":
-                get_key = "type";
-                break;
-            case "any-on":
-                get_key = "any_on";
-                break;
-            case "all-on":
-                get_key = "all_on";
-                break;
-        }
+        string get_key = key_override (key);
 
-        var obj_class = (ObjectClass) get_type ().class_ref ();
         var prop = obj_class.find_property (key);
 
         // Do not attempt to save a non-mapped key
@@ -210,10 +204,71 @@ public abstract class LightsUp.Model.JsonObject : GLib.Object {
         }
     }
 
+    /**
+     * Get's a string representation of this object. Useful for serialization
+     */
     public string to_string (bool prettyfied) {
         var node = new Json.Node.alloc ();
         node.set_object (object);
 
         return Json.to_string (node, prettyfied);
+    }
+
+    /**
+     * Got a new Json Object and want to update it's properties. Do it from here!
+     */
+    public void override_properties_from_json (Json.Object new_object) {
+        notify.disconnect (handle_notify);
+
+        var properties = obj_class.list_properties ();
+        foreach (var prop in properties) {
+            var prop_name = prop.name;
+            if (prop_name == "object" || prop_name == "parent-object") {
+                continue;
+            }
+
+            string get_key = key_override (prop_name);
+            if (!new_object.has_member (get_key)) {
+                return;
+            }
+
+            var type = prop.value_type;
+            var original_value = Value (type);
+            this.get_property (prop_name.down (), ref original_value);
+
+            bool change_prop = false;
+
+            if (type == typeof (int)) {
+                change_prop = (original_value.get_int () != new_object.get_int_member (get_key));
+            } else if (type == typeof (uint)) {
+                change_prop = (original_value.get_uint () != new_object.get_int_member (get_key));
+            } else if (type == typeof (int64)) {
+                change_prop = (original_value.get_int64 () != new_object.get_int_member (get_key));
+            } else if (type == typeof (double)) {
+                change_prop = (original_value.get_double () != new_object.get_double_member (get_key));
+            } else if (type == typeof (string)) {
+                change_prop = (original_value.get_string () != new_object.get_string_member (get_key));
+            } else if (type == typeof (string[])) {
+                //  string[] strings = null;
+                //  this.get (key, &strings);
+                //  if (strings != schema.get_strv (key)) {
+                //      schema.set_strv (key, strings);
+                //  }
+            } else if (type == typeof (bool)) {
+                change_prop = (original_value.get_boolean () != new_object.get_boolean_member (get_key));
+            } else if (type.is_a (typeof (JsonObject))) {
+                var object = new_object.get_object_member (get_key);
+
+                var json_object = (JsonObject) original_value.get_object ();
+                json_object.override_properties_from_json (object);
+            }
+
+            if (change_prop) {
+                load_key (prop.name, new_object);
+                changed (prop.name);
+            }
+        }
+
+        notify.connect (handle_notify);
     }
 }

@@ -38,6 +38,23 @@ public class LightsUp.Api.Lights : Object {
         endpoint.request ("GET", "lights", null, this.get_lights_callback);
     }
 
+    private void update_callback (string response) {
+        try {
+            print ("Updating light\n");
+            var parser = new Json.Parser ();
+			parser.load_from_data (response, -1);
+
+            var root_object = parser.get_root ().get_object ();
+
+            root_object.foreach_member ((i, name, node) => {
+                lights.get (name).override_properties_from_json (node.get_object ());
+
+            });
+        } catch (Error e) {
+
+        }
+    }
+
     private void get_lights_callback (string response) {
         lights = new Gee.HashMap<string, LightsUp.Model.Light> ();
 

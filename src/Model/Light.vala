@@ -33,6 +33,15 @@ public class LightsUp.Model.Light : JsonObject {
         connect_to_api ();
     }
 
+    protected override string key_override (string key) {
+        switch (key) {
+            case "type-":
+                return "type";
+            default:
+                return key;
+        }
+    }
+
     protected override void api_call (string key) {
         print ("light api: %s %u\n", key, ref_count);
     }
@@ -59,6 +68,7 @@ public class LightsUp.Model.Light : JsonObject {
             var body = "{\"%s\": %s}".printf (key, get_string_property (key));
 
             endpoint.request ("PUT", path, body, update_callback);
+            print ("light state api: %s\n", key);
         }
 
         public void update_callback (string response) {

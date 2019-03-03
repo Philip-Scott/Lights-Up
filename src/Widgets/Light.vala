@@ -81,7 +81,19 @@ public class LightsUp.Widgets.LightWidget : Gtk.Grid {
         show_all ();
         set_color ();
 
-        light.state.changed.connect (set_color);
+        light.state.changed.connect (update_property);
+    }
+
+    private void update_property (string prop) {
+        switch (prop) {
+            case "on":
+                light_switch.state = light.state.on;
+            break;
+        }
+
+        print ("%s Prop updated\n", prop);
+
+        set_color ();
     }
 
     private void set_color () {

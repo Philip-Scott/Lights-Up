@@ -38,6 +38,15 @@ public class LightsUp.Model.Room : JsonObject {
         connect_to_api ();
     }
 
+    protected override string key_override (string key) {
+        switch (key) {
+            case "type-":
+                return "type";
+            default:
+                return key;
+        }
+    }
+
     protected override void api_call (string key) {
 
     }
@@ -45,6 +54,17 @@ public class LightsUp.Model.Room : JsonObject {
     public class GroupState : JsonObject {
         public bool any_on { get; set; }
         public bool all_on { get; set; }
+
+        protected override string key_override (string key) {
+            switch (key) {
+                case "any-on":
+                    return "any_on";
+                case "all-on":
+                    return "all_on";
+                default:
+                    return key;
+            }
+        }
     }
 
     public class GroupAction : JsonObject {
