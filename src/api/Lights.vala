@@ -49,7 +49,6 @@ public class LightsUp.Api.Lights : Object {
 
             root_object.foreach_member ((i, name, node) => {
                 var light = new LightsUp.Model.Light (node.get_object (), name);
-
                 lights.set (name, light);
             });
         } catch (Error e) {}

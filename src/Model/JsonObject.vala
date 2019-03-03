@@ -44,6 +44,7 @@ public abstract class LightsUp.Model.JsonObject : GLib.Object {
 
     void handle_notify (Object sender, ParamSpec property) {
         notify.disconnect (handle_notify);
+        save_on_object (property.name);
         call_verify (property.name);
         notify.connect (handle_notify);
     }
@@ -142,6 +143,77 @@ public abstract class LightsUp.Model.JsonObject : GLib.Object {
                 return ((int64) val).to_string ();
         }
 
-        return "";
+        assert_not_reached ();
+    }
+
+    private void save_on_object (string key) {
+        if (key == "object" || key == "parent-object") {
+            return;
+        }
+
+        string get_key = key;
+        switch (key) {
+            case "type-":
+                get_key = "type";
+                break;
+            case "any-on":
+                get_key = "any_on";
+                break;
+            case "all-on":
+                get_key = "all_on";
+                break;
+        }
+
+        var obj_class = (ObjectClass) get_type ().class_ref ();
+        var prop = obj_class.find_property (key);
+
+        // Do not attempt to save a non-mapped key
+        if (prop == null)
+            return;
+
+        var type = prop.value_type;
+        var val = Value (type);
+        this.get_property (prop.name, ref val);
+
+        if (val.type () == prop.value_type) {
+            if (type == typeof (int)) {
+                if (val.get_int () != object.get_int_member (key)) {
+                    object.set_int_member (get_key, val.get_int ());
+                }
+            } else if (type == typeof (uint)) {
+                if (val.get_uint () != object.get_int_member (key)) {
+                    object.set_int_member (get_key, val.get_uint ());
+                }
+            } else if (type == typeof (int64)) {
+                if (val.get_int64 () != object.get_int_member (key)) {
+                    object.set_int_member (get_key, val.get_int64 ());
+                }
+            } else if (type == typeof (double)) {
+                if (val.get_double () != object.get_double_member (key)) {
+                    object.set_double_member (key, val.get_double ());
+                }
+            } else if (type == typeof (string)) {
+                if (val.get_string () != object.get_string_member (key)) {
+                    object.set_string_member (key, val.get_string ());
+                }
+            } else if (type == typeof (string[])) {
+                //  string[] strings = null;
+                //  this.get (key, &strings);
+                //  if (strings != schema.get_strv (key)) {
+                //      schema.set_strv (key, strings);
+                //  }
+            } else if (type == typeof (bool)) {
+                if (val.get_boolean () != object.get_boolean_member (key)) {
+                    object.set_boolean_member (key, val.get_boolean ());
+                }
+            }
+        }
+    }
+
+    public string to_string (bool prettyfied) {
+        var node = new Json.Node.alloc ();
+        node.set_object (object);
+
+        return Json.to_string (node, prettyfied);
     }
 }
