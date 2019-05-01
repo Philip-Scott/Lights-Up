@@ -23,7 +23,7 @@ public class LightsUp.Model.Room : JsonObject {
     public string type_ { get; set; }
     public string name { get; set; }
     public string class { get; set; }
-    public string[] lights { get; set; }
+    public string[] lights { get; internal set; }
 
     public GroupAction action { get; set; }
     public GroupState state { get; set; }
@@ -32,10 +32,7 @@ public class LightsUp.Model.Room : JsonObject {
         Object (object: object);
 
         api_id = _api_id;
-        action.connect_to_api ();
-        state.connect_to_api ();
-
-        connect_to_api ();
+        connect_signals ();
     }
 
     protected override string key_override (string key) {
@@ -47,8 +44,8 @@ public class LightsUp.Model.Room : JsonObject {
         }
     }
 
-    protected override void api_call (string key) {
-
+    protected override bool internal_changed (string key) {
+        return true;
     }
 
     public class GroupState : JsonObject {
@@ -77,13 +74,14 @@ public class LightsUp.Model.Room : JsonObject {
         public string alert { get; set; }
         public string colormode { get; set; }
 
-        protected override void api_call (string key) {
+        protected override bool internal_changed (string key) {
             var endpoint = LightsUp.Api.Endpoint.get_instance ();
 
             var path = "groups/%s/action".printf (((Room) parent_object).api_id);
             var body = "{\"%s\": %s}".printf (key, get_string_property (key));
 
             endpoint.request ("PUT", path, body, update_callback);
+            return true;
         }
 
         public void update_callback (string response) {

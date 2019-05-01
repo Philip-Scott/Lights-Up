@@ -29,8 +29,7 @@ public class LightsUp.Model.Light : JsonObject {
         Object (object: object);
 
         api_id = _api_id;
-        state.connect_to_api ();
-        connect_to_api ();
+        connect_signals ();
     }
 
     protected override string key_override (string key) {
@@ -42,8 +41,9 @@ public class LightsUp.Model.Light : JsonObject {
         }
     }
 
-    protected override void api_call (string key) {
+    protected override bool internal_changed (string key) {
         print ("light api: %s %u\n", key, ref_count);
+        return true;
     }
 
     public class LightsState : JsonObject {
@@ -61,7 +61,7 @@ public class LightsUp.Model.Light : JsonObject {
             Object (object: object);
         }
 
-        protected override void api_call (string key) {
+        protected override bool internal_changed (string key) {
             var endpoint = LightsUp.Api.Endpoint.get_instance ();
 
             var path = "lights/%s/state".printf (((Light) parent_object).api_id);
@@ -69,6 +69,7 @@ public class LightsUp.Model.Light : JsonObject {
 
             endpoint.request ("PUT", path, body, update_callback);
             print ("light state api: %s\n", key);
+            return true;
         }
 
         public void update_callback (string response) {

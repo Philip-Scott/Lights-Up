@@ -126,10 +126,12 @@ private class Request : QueuedEvent {
     }
 
     public override void run () {
+        debug ("Running request ----------------------------------------- \n");
         var session = new Soup.Session ();
         session.timeout = 1;
 
         var message = new Soup.Message (method, path);
+        debug ("Method: %s\nPath: %s\n", method, path);
 
         if (body != null) {
             message.set_request ("application/json", Soup.MemoryUse.COPY, body.data);
@@ -141,6 +143,8 @@ private class Request : QueuedEvent {
 
         if (response_body != null) {
             var response_data = (string) response_body.flatten ().data;
+            debug ("Response: \n%s", response_data);
+
             callback (response_data);
         }
     }
