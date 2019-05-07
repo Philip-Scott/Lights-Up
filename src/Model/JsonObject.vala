@@ -154,6 +154,8 @@ public abstract class LightsUp.Model.JsonObject : GLib.Object {
             source_object.get_array_member (get_key).get_elements ().foreach ((node) => {
                 list.add (node.get_string ());
             });
+
+            list.add (null);
             set_property (prop.name, list.to_array ());
         } else {
 
