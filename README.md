@@ -17,6 +17,7 @@ These dependencies must be present before building
  - `libgranite-dev`
  - `libgtk-3-dev`
  - `libsoup`
+ - `libjson-glib-dev`
 
 
  ### Building
