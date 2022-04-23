@@ -88,7 +88,7 @@ public class LightsUp.RateLimitter : Object {
 public abstract class QueuedEvent : Object {
     public string id { get; construct set; }
 
-    public QueuedEvent (string id) {
+    protected QueuedEvent (string id) {
         Object (id: id);
     }
 

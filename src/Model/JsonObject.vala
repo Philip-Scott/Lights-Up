@@ -17,7 +17,7 @@
  *  Boston, MA 02110-1301 USA.
  */
 
-public abstract class LightsUp.Model.JsonObject : GLib.Object {
+ public abstract class LightsUp.Model.JsonObject : GLib.Object {
 
     /**
      *Triggered when a property of the object has been set, if it was not
@@ -31,7 +31,7 @@ public abstract class LightsUp.Model.JsonObject : GLib.Object {
 
     private ObjectClass obj_class;
 
-    public JsonObject.from_object (Json.Object object) {
+    protected JsonObject.from_object (Json.Object object) {
         Object (object: object);
     }
 
@@ -336,7 +336,7 @@ public abstract class LightsUp.Model.JsonObjectArray : Object {
      *
      * Your JsonObject implementation should have it's own list of items
      */
-    public JsonObjectArray (Json.Object object, string property_name) {
+    protected JsonObjectArray (Json.Object object, string property_name) {
         Object (object: object, property_name: property_name);
     }
 
