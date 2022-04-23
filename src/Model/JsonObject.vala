@@ -17,7 +17,7 @@
  *  Boston, MA 02110-1301 USA.
  */
 
- public abstract class LightsUp.Model.JsonObject : GLib.Object {
+public abstract class LightsUp.Model.JsonObject : GLib.Object {
 
     /**
      *Triggered when a property of the object has been set, if it was not
